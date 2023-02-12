@@ -5,6 +5,7 @@ from awscrt import io, mqtt, auth, http
 from awsiot import mqtt_connection_builder
 import time as t
 import json
+import time, random
 
 # Define ENDPOINT, CLIENT_ID, PATH_TO_CERTIFICATE, PATH_TO_PRIVATE_KEY, PATH_TO_AMAZON_ROOT_CA_1, MESSAGE, TOPIC, and RANGE
 ENDPOINT = "a3dmuovys4knte-ats.iot.ap-south-1.amazonaws.com"
@@ -39,12 +40,21 @@ connect_future.result()
 print("Connected!")
 # Publish message to server desired number of times.
 print('Begin Publish')
-for i in range (RANGE):
-    data = "{} [{}]".format(MESSAGE, i+1)
-    message = {"message" : data}
-    mqtt_connection.publish(topic=TOPIC, payload=json.dumps(message), qos=mqtt.QoS.AT_LEAST_ONCE)
-    print("Published: '" + json.dumps(message) + "' to the topic: " + "'test/testing'")
-    t.sleep(0.1)
+
+while True:
+    data = {}
+    for i in range(5):
+        data[f"boogie{i+1}"] = random.randint(0, 255)
+    mqtt_connection.publish(topic=TOPIC, payload=json.dumps(data), qos=mqtt.QoS.AT_LEAST_ONCE)
+    print("Published: '" + json.dumps(data) + "' to the topic: " + "'test/testing'")
+    time.sleep(5)
+
+# for i in range (RANGE):
+#     data = "{} [{}]".format(MESSAGE, i+1)
+#     message = {"message" : data}
+#     mqtt_connection.publish(topic=TOPIC, payload=json.dumps(message), qos=mqtt.QoS.AT_LEAST_ONCE)
+#     print("Published: '" + json.dumps(message) + "' to the topic: " + "'test/testing'")
+#     t.sleep(0.1)
 print('Publish End')
 disconnect_future = mqtt_connection.disconnect()
 disconnect_future.result()
